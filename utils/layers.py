@@ -3,7 +3,7 @@ import numpy as np
 from qiskit import QuantumCircuit 
 from qiskit.circuit import ParameterVector
 
-def alternating_sq_2q_layers(num_qubits, depths = 1, two_q_gate_type = None, connectivity = None):
+def alternating_sq_2q_layers(num_qubits, depths = 1, two_q_gate_type = None, connectivity = None, measurement = False):
     """
     num_qubits: int
                 number of qubits for quantum circuit
@@ -24,8 +24,10 @@ def alternating_sq_2q_layers(num_qubits, depths = 1, two_q_gate_type = None, con
     num_params = (2+3*(depths-1))* num_qubits + len(connectivity) * 1 * depths # number of parameters needed for single qubit gate + two qubit gate (which equals to 1, always)
     params = ParameterVector('x', num_params)
     num_2q_gates = len(connectivity)
-    
-    circuit = QuantumCircuit(num_qubits)
+    if measurement:
+        circuit = QuantumCircuit(num_qubits, num_qubits)
+    else:
+        circuit = QuantumCircuit(num_qubits)
     two_qubit_gate = getattr(circuit, two_q_gate_type.lower())
     
     params_counts = 0
@@ -56,4 +58,7 @@ def alternating_sq_2q_layers(num_qubits, depths = 1, two_q_gate_type = None, con
     else:
         pass
       
+    if measurement:
+        circuit.measure(range(num_qubits),range(num_qubits))
+        
     return circuit
